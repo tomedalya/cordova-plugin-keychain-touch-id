@@ -24,25 +24,33 @@
 
 @implementation TouchID
 
-- (void)isAvailable:(CDVInvokedUrlCommand*)command{
-    self.laContext = [[LAContext alloc] init];
-    NSError *error = nil;
-    BOOL touchIDAvailable = [self.laContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error];
-    if(touchIDAvailable){
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-    }
-    else{
-        if(error.code == -7){
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: @"No FP available"];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-        }
-        if(error.code == -6){
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: @"No hardware available"];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-        }
-
-    }
+- (void) isAvailable:(CDVInvokedUrlCommand*)command {
+    
+  LAContext *context = [[LAContext alloc] init];
+  
+  if (NSClassFromString(@"LAContext") == NULL) {
+      [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR] callbackId:command.callbackId];
+      return;
+  }
+  
+  [self.commandDelegate runInBackground:^{
+      NSError *error = nil;
+      LAContext *laContext = [[LAContext alloc] init];
+      if ([laContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error]) {
+          NSString *biometryType = @"touch";
+          if (@available(iOS 11.0, *)) {
+              if (laContext.biometryType == LABiometryTypeFaceID) {
+                  biometryType = @"face";
+              }
+          }
+          [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:biometryType]
+                                      callbackId:command.callbackId];
+      } else {
+          NSArray *errorKeys = @[@"code", @"localizedDescription"];
+          [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:[error dictionaryWithValuesForKeys:errorKeys]]
+                                      callbackId:command.callbackId];
+      }
+  }];
 }
 
 - (void)setLocale:(CDVInvokedUrlCommand*)command{
