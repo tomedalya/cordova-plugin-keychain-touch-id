@@ -69,7 +69,7 @@ public class FingerprintAuth extends CordovaPlugin {
     /**
      * Alias for our key in the Android Key Store
      */
-    private final static String mClientId = "CordovaTouchPlugin";
+    private static String mClientId = "CordovaTouchPlugin";
     /**
      * Used to encrypt token
      */
@@ -200,6 +200,10 @@ public class FingerprintAuth extends CordovaPlugin {
             }
             return true;
         }  else if (action.equals("isAvailable")) {
+            String clientId = args.getString(0);
+            if (clientId != null) {
+                mClientId = clientId;
+            }
             JSONObject resultJson = new JSONObject();
             if (isFingerprintAuthAvailable()) {
                 mPluginResult = new PluginResult(PluginResult.Status.OK);
