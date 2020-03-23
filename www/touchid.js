@@ -3,7 +3,7 @@ var argscheck = require('cordova/argscheck'),
 
 var touchid = {
 	isAvailable: function(successCallback, errorCallback){
-		exec(successCallback, errorCallback, "TouchID", "isAvailable", []);
+		exec(successCallback, errorCallback, "TouchID", "isAvailable", [clientId]);
 	},
 	save: function(key,password, successCallback, errorCallback) {
 		exec(successCallback, errorCallback, "TouchID", "save", [key,password]);
