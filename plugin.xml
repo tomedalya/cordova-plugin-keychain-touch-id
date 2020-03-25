@@ -27,6 +27,10 @@
         <source-file src="src/ios/KeychainWrapper.m" />
         <header-file src="src/ios/TouchID.h" />
         <source-file src="src/ios/TouchID.m" />
+        <header-file src="src/ios/A0SimpleKeychain+KeyPair.h" />
+        <source-file src="src/ios/A0SimpleKeychain+KeyPair.m" />
+        <header-file src="src/ios/A0SimpleKeychain.h" />
+        <source-file src="src/ios/A0SimpleKeychain.m" />
         <framework src="Security.framework" />
         <framework src="Foundation.framework"/>
         <framework src="LocalAuthentication.framework"/>
