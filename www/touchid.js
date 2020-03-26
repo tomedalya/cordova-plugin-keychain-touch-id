@@ -19,6 +19,9 @@ var touchid = {
 	},
 	setLocale: function(locale,successCallback, errorCallback){
 		exec(successCallback, errorCallback, "TouchID", "setLocale", [locale]);
+	},
+	get: function(params, successCallback, errorCallback){
+		exec(successCallback, errorCallback, "TouchID", "get", [params]);		
 	}
 };
 
