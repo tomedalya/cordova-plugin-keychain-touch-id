@@ -5,6 +5,11 @@ import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaInterface;
 
+import android.Manifest;
+import android.app.Activity;
+import android.app.FragmentTransaction;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.annotation.TargetApi;
 import android.app.KeyguardManager;
 import android.content.Context;
