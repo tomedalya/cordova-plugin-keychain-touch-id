@@ -668,4 +668,147 @@ public class FingerprintAuth extends CordovaPlugin {
             Log.e(TAG, e.getMessage());
         }
     }
+    
+    // can be removed after ionic 4 migration is done
+    private boolean useBackupLockScreen() {
+        if (!mKeyguardManager.isKeyguardSecure()) {
+            return false;
+        } else {
+            return true;
+        }
+
+    }
+    
+    // can be removed after ionic 4 migration is done
+    private void showAuthenticationScreen() {
+        // Create the Confirm Credentials screen. You can customize the title and description. Or
+        // we will provide a generic one for you if you leave it null
+        Intent intent = mKeyguardManager.createConfirmDeviceCredentialIntent(null, null);
+        if (intent != null) {
+            startActivityForResult(intent, REQUEST_CODE_CONFIRM_DEVICE_CREDENTIALS);
+        }
+    }
+    
+    // can be removed after ionic 4 migration is done
+        /**
+     * Initialize the {@link Cipher} instance with the created key in the {@link #createKey()}
+     * method.
+     *
+     * @return {@code true} if initialization is successful, {@code false} if the lock screen has
+     * been disabled or reset after the key was generated, or if a fingerprint got enrolled after
+     * the key was generated.
+     */
+    private static boolean initCipher() {
+        boolean initCipher = false;
+        String errorMessage = "";
+        String initCipherExceptionErrorPrefix = "Failed to init Cipher: ";
+        byte[] mCipherIV;
+
+        try {
+            SecretKey key = getSecretKey();
+
+            if (mCipherModeCrypt) {
+                mCipher.init(Cipher.ENCRYPT_MODE, key);
+                mCipherIV = mCipher.getIV();
+                setStringPreference(mContext, mClientId + mUsername,
+                        FINGERPRINT_PREF_IV, new String(Base64.encode(mCipherIV, Base64.NO_WRAP)));
+            } else {
+                mCipherIV = Base64.decode(getStringPreference(mContext, mClientId + mUsername,
+                        FINGERPRINT_PREF_IV), Base64.NO_WRAP);
+                IvParameterSpec ivspec = new IvParameterSpec(mCipherIV);
+                mCipher.init(Cipher.DECRYPT_MODE, key, ivspec);
+            }
+            initCipher = true;
+        } catch (Exception e) {
+            errorMessage = initCipherExceptionErrorPrefix + "Exception: " + e.toString();
+        }
+        if (!initCipher) {
+            Log.e(TAG, errorMessage);
+        }
+        return initCipher;
+    }
+    
+    // can be removed after ionic 4 migration is done
+    public static void onAuthenticated(boolean withFingerprint,
+                                       FingerprintManager.AuthenticationResult result) {
+        JSONObject resultJson = new JSONObject();
+        String errorMessage = "";
+        boolean createdResultJson = false;
+
+        try {
+            byte[] bytes;
+            FingerprintManager.CryptoObject cryptoObject = null;
+
+            if (withFingerprint) {
+                resultJson.put("withFingerprint", true);
+                cryptoObject = result.getCryptoObject();
+            } else {
+                resultJson.put("withBackup", true);
+
+                // If failed to init cipher because of InvalidKeyException, create new key
+                if (!initCipher()) {
+                    createKey();
+                }
+
+                if (initCipher()) {
+                    cryptoObject = new FingerprintManager.CryptoObject(mCipher);
+                }
+            }
+
+            if (cryptoObject == null) {
+                errorMessage = PluginError.INIT_CIPHER_FAILED.name();
+            } else {
+                if (mCipherModeCrypt) {
+                    bytes = cryptoObject.getCipher().doFinal(mClientSecret.getBytes("UTF-8"));
+                    String encodedBytes = Base64.encodeToString(bytes, Base64.NO_WRAP);
+                    resultJson.put("token", encodedBytes);
+                } else {
+                    bytes = cryptoObject.getCipher()
+                            .doFinal(Base64.decode(mClientSecret, Base64.NO_WRAP));
+                    String credentialString = new String(bytes, "UTF-8");
+                    Pattern pattern = Pattern.compile(Pattern.quote(CREDENTIAL_DELIMITER));
+                    String[] credentialArray = pattern.split(credentialString);
+                    if (credentialArray.length == 2) {
+                        String username = credentialArray[0];
+                        String password = credentialArray[1];
+                        if (username.equalsIgnoreCase(mClientId + mUsername)) {
+                            resultJson.put("password", credentialArray[1]);
+                        }
+                    } else {
+                        credentialArray = credentialString.split(":");
+                        if (credentialArray.length == 2) {
+                            String username = credentialArray[0];
+                            String password = credentialArray[1];
+                            if (username.equalsIgnoreCase(mClientId + mUsername)) {
+                                resultJson.put("password", credentialArray[1]);
+                            }
+                        }
+                    }
+                }
+                createdResultJson = true;
+            }
+        } catch (BadPaddingException e) {
+            Log.e(TAG, "Failed to encrypt the data with the generated key:"
+                    + " BadPaddingException:  " + e.toString());
+            errorMessage = PluginError.BAD_PADDING_EXCEPTION.name();
+        } catch (IllegalBlockSizeException e) {
+            Log.e(TAG, "Failed to encrypt the data with the generated key: "
+                    + "IllegalBlockSizeException: " + e.toString());
+            errorMessage = PluginError.ILLEGAL_BLOCK_SIZE_EXCEPTION.name();
+        } catch (JSONException e) {
+            Log.e(TAG, "Failed to set resultJson key value pair: " + e.toString());
+            errorMessage = PluginError.JSON_EXCEPTION.name();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        if (createdResultJson) {
+            mCallbackContext.success(resultJson);
+            mPluginResult = new PluginResult(PluginResult.Status.OK);
+        } else {
+            mCallbackContext.error(errorMessage);
+            mPluginResult = new PluginResult(PluginResult.Status.ERROR);
+        }
+        mCallbackContext.sendPluginResult(mPluginResult);
+    }
 }
