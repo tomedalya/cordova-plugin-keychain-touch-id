@@ -65,6 +65,29 @@ public class FingerprintAuth extends CordovaPlugin {
     public static CallbackContext mCallbackContext;
     public static PluginResult mPluginResult;
 
+    // can be deleted after migration is done
+    public enum PluginError {
+            BAD_PADDING_EXCEPTION,
+            CERTIFICATE_EXCEPTION,
+            FINGERPRINT_CANCELLED,
+            FINGERPRINT_DATA_NOT_DELETED,
+            FINGERPRINT_ERROR,
+            FINGERPRINT_NOT_AVAILABLE,
+            FINGERPRINT_PERMISSION_DENIED,
+            FINGERPRINT_PERMISSION_DENIED_SHOW_REQUEST,
+            ILLEGAL_BLOCK_SIZE_EXCEPTION,
+            INIT_CIPHER_FAILED,
+            INVALID_ALGORITHM_PARAMETER_EXCEPTION,
+            IO_EXCEPTION,
+            JSON_EXCEPTION,
+            MINIMUM_SDK,
+            MISSING_ACTION_PARAMETERS,
+            MISSING_PARAMETERS,
+            NO_SUCH_ALGORITHM_EXCEPTION,
+            SECURITY_EXCEPTION,
+            FRAGMENT_NOT_EXIST
+        }
+
     /**
      * Alias for our key in the Android Key Store
      */
@@ -257,9 +280,18 @@ public class FingerprintAuth extends CordovaPlugin {
             }
             mCallbackContext.sendPluginResult(mPluginResult);
             return true;
-        } else if (action.equals("get")) { //delete key
+        } else if (action.equals("get")) { //get key
+            // can be deleted after migration is done
             final JSONObject arg_object = args.getJSONObject(0);
-
+            String mUsername;
+            boolean mEncryptNoAuth = false;
+            String mClientSecret;
+            boolean mDisableBackup = true;
+            int mMaxAttempts = 3;
+            boolean mUserAuthRequired = true;
+            String mDialogTitle;
+            String mDialogMessage;
+            String mDialogHint;
             JSONObject resultJson = new JSONObject();
 
                 if (!arg_object.has("clientId")) {
@@ -277,13 +309,12 @@ public class FingerprintAuth extends CordovaPlugin {
                 }
 
                     boolean missingParam = false;
-                    mEncryptNoAuth = false;
+                    //mEncryptNoAuth = false;
                             if (arg_object.has("token")) {
                                 mClientSecret = arg_object.getString("token");
                             } else {
                                 missingParam = true;
                             }
-                            break;
 
                     if (missingParam) {
                         Log.e(TAG, "Missing required parameters for specified action.");
