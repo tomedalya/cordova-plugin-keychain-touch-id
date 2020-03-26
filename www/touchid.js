@@ -6,7 +6,7 @@ var touchid = {
 		exec(successCallback, errorCallback, "TouchID", "isAvailable", [clientId]);
 	},
 	save: function(key,password, successCallback, errorCallback) {
-		exec(successCallback, errorCallback, "TouchID", "save", [key,password]);
+		exec(successCallback, errorCallback, "TouchID", "save", [key,password, true]);
 	},
 	verify: function(key,message,successCallback, errorCallback){
 		exec(successCallback, errorCallback, "TouchID", "verify", [key,message]);
