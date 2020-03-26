@@ -33,7 +33,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
-import java.security.UnrecoverableEntryException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.Locale;
@@ -339,9 +338,6 @@ public class FingerprintAuth extends CordovaPlugin {
         } catch (NoSuchAlgorithmException e) {
             errorMessage = getSecretKeyExceptionErrorPrefix
                     + "NoSuchAlgorithmException";
-        } catch (UnrecoverableEntryException e) {
-            errorMessage = getSecretKeyExceptionErrorPrefix
-                    + "UnrecoverableEntryException";
         }
         if (key == null) {
             Log.e(TAG, errorMessage);
