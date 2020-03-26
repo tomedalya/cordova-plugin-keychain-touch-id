@@ -41,6 +41,7 @@ import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -92,6 +93,13 @@ public class FingerprintAuth extends CordovaPlugin {
             SECURITY_EXCEPTION,
             FRAGMENT_NOT_EXIST
         }
+    private static String mClientSecret;
+    private static boolean mCipherModeCrypt = true;
+    private static String mUsername = "";
+    public static Context mContext;
+    public static final String FINGERPRINT_PREF_IV = "aes_iv";
+    private static final int REQUEST_CODE_CONFIRM_DEVICE_CREDENTIALS = 1;
+    private static final String CREDENTIAL_DELIMITER = "|:|";
 
     /**
      * Alias for our key in the Android Key Store
@@ -127,6 +135,8 @@ public class FingerprintAuth extends CordovaPlugin {
         Log.v(TAG, "Init FingerprintAuth");
         packageName = cordova.getActivity().getApplicationContext().getPackageName();
         mPluginResult = new PluginResult(PluginResult.Status.NO_RESULT);
+        //can be removed after ionic 4 migration
+        mContext = cordova.getActivity().getApplicationContext();
 
         if (android.os.Build.VERSION.SDK_INT < 23) {
             return;
@@ -288,9 +298,7 @@ public class FingerprintAuth extends CordovaPlugin {
         } else if (action.equals("get")) { //get key
             // can be deleted after migration is done
             final JSONObject arg_object = args.getJSONObject(0);
-            String mUsername;
             boolean mEncryptNoAuth = false;
-            String mClientSecret;
             boolean mDisableBackup = true;
             int mMaxAttempts = 3;
             boolean mUserAuthRequired = true;
@@ -803,8 +811,6 @@ public class FingerprintAuth extends CordovaPlugin {
         } catch (JSONException e) {
             Log.e(TAG, "Failed to set resultJson key value pair: " + e.toString());
             errorMessage = PluginError.JSON_EXCEPTION.name();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
         }
 
         if (createdResultJson) {
@@ -815,5 +821,34 @@ public class FingerprintAuth extends CordovaPlugin {
             mPluginResult = new PluginResult(PluginResult.Status.ERROR);
         }
         mCallbackContext.sendPluginResult(mPluginResult);
+    }
+    
+    private static SecretKey getSecretKey() {
+        String errorMessage = "";
+        String getSecretKeyExceptionErrorPrefix = "Failed to get SecretKey from KeyStore: ";
+        SecretKey key = null;
+        try {
+            mKeyStore.load(null);
+            key = (SecretKey) mKeyStore.getKey(mClientId, null);
+        } catch (KeyStoreException e) {
+            errorMessage = getSecretKeyExceptionErrorPrefix
+                    + "KeyStoreException: " + e.toString();
+        } catch (CertificateException e) {
+            errorMessage = getSecretKeyExceptionErrorPrefix
+                    + "CertificateException: " + e.toString();
+        } catch (UnrecoverableKeyException e) {
+            errorMessage = getSecretKeyExceptionErrorPrefix
+                    + "UnrecoverableKeyException: " + e.toString();
+        } catch (IOException e) {
+            errorMessage = getSecretKeyExceptionErrorPrefix
+                    + "IOException: " + e.toString();
+        } catch (NoSuchAlgorithmException e) {
+            errorMessage = getSecretKeyExceptionErrorPrefix
+                    + "NoSuchAlgorithmException: " + e.toString();
+        }
+        if (key == null) {
+            Log.e(TAG, errorMessage);
+        }
+        return key;
     }
 }
