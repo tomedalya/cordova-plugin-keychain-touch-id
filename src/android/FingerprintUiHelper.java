@@ -184,5 +184,9 @@ public class FingerprintUiHelper extends FingerprintManager.AuthenticationCallba
         void onAuthenticated();
 
         void onError();
+
+        void onAuthenticated(FingerprintManager.AuthenticationResult result);
+
+        void onError(CharSequence errString);
     }
 }

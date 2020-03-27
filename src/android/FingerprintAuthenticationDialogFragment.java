@@ -205,6 +205,16 @@ public class FingerprintAuthenticationDialogFragment extends DialogFragment
     }
 
     @Override
+    public void onAuthenticated(FingerprintManager.AuthenticationResult result) {
+        //not needed
+    }
+
+    @Override
+    public void onError(CharSequence errString) {
+        //not needed
+    }
+
+    @Override
     public void onCancel(DialogInterface dialog) {
         super.onCancel(dialog);
         FingerprintAuth.onCancelled();

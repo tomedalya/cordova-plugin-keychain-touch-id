@@ -261,6 +261,11 @@ public class FingerprintAuthenticationDialogFragmentOld extends DialogFragment
     }
 
     @Override
+    public void onAuthenticated() {
+        // not needed
+    }
+
+    @Override
     public void onError(CharSequence errString) {
         if (!FingerprintAuth.mDisableBackup) {
             if (getActivity() != null && isAdded()) {
@@ -271,6 +276,11 @@ public class FingerprintAuthenticationDialogFragmentOld extends DialogFragment
             dismissAllowingStateLoss();
 
         }
+    }
+
+    @Override
+    public void onError() {
+        // not needed
     }
 
     @Override
