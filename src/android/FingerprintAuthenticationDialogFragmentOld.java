@@ -86,19 +86,19 @@ public class FingerprintAuthenticationDialogFragmentOld extends DialogFragment
 
         // Set dialog Title
         int fingerprint_auth_dialog_title_id = getResources()
-                .getIdentifier("fingerprint_auth_dialog_title", "id", FingerprintAuth.packageName);
+                .getIdentifier("fingerprint_description", "id", FingerprintAuth.packageName);
         TextView dialogTitleTextView = (TextView) v.findViewById(fingerprint_auth_dialog_title_id);
         if (null != FingerprintAuth.mDialogTitle) {
             dialogTitleTextView.setText(FingerprintAuth.mDialogTitle);
         }
 
         // Set dialog message
-        int fingerprint_description_id = getResources()
-                .getIdentifier("fingerprint_description", "id", FingerprintAuth.packageName);
-        TextView dialogMessageTextView = (TextView) v.findViewById(fingerprint_description_id);
-        if (null != FingerprintAuth.mDialogMessage) {
-            dialogMessageTextView.setText(FingerprintAuth.mDialogMessage);
-        }
+//        int fingerprint_description_id = getResources()
+//                .getIdentifier("fingerprint_description", "id", FingerprintAuth.packageName);
+//        TextView dialogMessageTextView = (TextView) v.findViewById(fingerprint_description_id);
+//        if (null != FingerprintAuth.mDialogMessage) {
+//            dialogMessageTextView.setText(FingerprintAuth.mDialogMessage);
+//        }
 
         // Set dialog hing
         int fingerprint_hint_id = getResources()
@@ -108,29 +108,29 @@ public class FingerprintAuthenticationDialogFragmentOld extends DialogFragment
             dialogHintTextView.setText(FingerprintAuth.mDialogHint);
         }
 
-        int cancel_button_id = getResources()
-                .getIdentifier("cancel_button", "id", FingerprintAuth.packageName);
-        mCancelButton = (Button) v.findViewById(cancel_button_id);
-        mCancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FingerprintAuth.onCancelled();
-                dismissAllowingStateLoss();
-            }
-        });
+//        int cancel_button_id = getResources()
+//                .getIdentifier("cancel_button", "id", FingerprintAuth.packageName);
+//        mCancelButton = (Button) v.findViewById(cancel_button_id);
+//        mCancelButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                FingerprintAuth.onCancelled();
+//                dismissAllowingStateLoss();
+//            }
+//        });
 
-        int second_dialog_button_id = getResources()
-                .getIdentifier("second_dialog_button", "id", FingerprintAuth.packageName);
-        mSecondDialogButton = (Button) v.findViewById(second_dialog_button_id);
-        if (FingerprintAuth.mDisableBackup) {
-            mSecondDialogButton.setVisibility(View.GONE);
-        }
-        mSecondDialogButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                goToBackup();
-            }
-        });
+//        int second_dialog_button_id = getResources()
+//                .getIdentifier("second_dialog_button", "id", FingerprintAuth.packageName);
+//        mSecondDialogButton = (Button) v.findViewById(second_dialog_button_id);
+//        if (FingerprintAuth.mDisableBackup) {
+//            mSecondDialogButton.setVisibility(View.GONE);
+//        }
+//        mSecondDialogButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                goToBackup();
+//            }
+//        });
         int fingerprint_container_id = getResources()
                 .getIdentifier("fingerprint_container", "id", FingerprintAuth.packageName);
         mFingerprintContent = v.findViewById(fingerprint_container_id);
@@ -197,10 +197,10 @@ public class FingerprintAuthenticationDialogFragmentOld extends DialogFragment
                 .getIdentifier("cancel", "string", FingerprintAuth.packageName);
         switch (mStage) {
             case FINGERPRINT:
-                mCancelButton.setText(cancel_id);
+//                mCancelButton.setText(cancel_id);
                 int use_backup_id = getResources()
                         .getIdentifier("use_backup", "string", FingerprintAuth.packageName);
-                mSecondDialogButton.setText(use_backup_id);
+//                mSecondDialogButton.setText(use_backup_id);
                 mFingerprintContent.setVisibility(View.VISIBLE);
                 break;
             case NEW_FINGERPRINT_ENROLLED:

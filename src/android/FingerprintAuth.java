@@ -96,7 +96,7 @@ public class FingerprintAuth extends CordovaPlugin {
             UNSUPPORTED_ENCODING
         }
     private static String mClientSecret;
-    private static boolean mCipherModeCrypt = true;
+    private static boolean mCipherModeCrypt = false;
     private static String mUsername = "";
     public static Context mContext;
     public static final String FINGERPRINT_PREF_IV = "aes_iv";
