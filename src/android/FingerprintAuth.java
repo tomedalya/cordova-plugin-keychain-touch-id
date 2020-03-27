@@ -195,11 +195,11 @@ public class FingerprintAuth extends CordovaPlugin {
             final String password = args.getString(1);
 
             if (isFingerprintAuthAvailable()) {
-                SecretKey secretKey = getSecretKey();
+                SecretKey secretKey = FingerprintAuth.getSecretKey();
                 boolean isCipherInit = true;
                 if (secretKey == null) {
                     if (createKey()) {
-                        secretKey = getSecretKey();
+                        secretKey = FingerprintAuth.getSecretKey();
                     }
                 }
                 mKeyID = key;
@@ -218,7 +218,7 @@ public class FingerprintAuth extends CordovaPlugin {
             final String message = args.getString(1);
 
             if (isFingerprintAuthAvailable()) {
-                SecretKey secretKey = getSecretKey();
+                SecretKey secretKey = FingerprintAuth.getSecretKey();
 
                 if (secretKey != null) {
                     mKeyID = key;
@@ -378,10 +378,10 @@ public class FingerprintAuth extends CordovaPlugin {
                     }
                     res.updateConfiguration(conf, dm);
 
-                    SecretKey key = getSecretKey();
+                    SecretKey key = FingerprintAuth.getSecretKey();
                     if (key == null) {
                         if (createKey()) {
-                            key = getSecretKey();
+                            key = FingerprintAuth.getSecretKey();
                         }
                     }
 
@@ -472,7 +472,7 @@ public class FingerprintAuth extends CordovaPlugin {
         String errorMessage = "";
         String initCipherExceptionErrorPrefix = "Failed to init Cipher: ";
         try {
-            SecretKey key = getSecretKey();
+            SecretKey key = FingerprintAuth.getSecretKey();
 
             if ( mode== Cipher.ENCRYPT_MODE){
                 SecureRandom r = new SecureRandom();
@@ -506,34 +506,34 @@ public class FingerprintAuth extends CordovaPlugin {
         return initCipher;
     }
 
-    private SecretKey getSecretKey() {
-        String errorMessage = "";
-        String getSecretKeyExceptionErrorPrefix = "Failed to get SecretKey from KeyStore: ";
-        SecretKey key = null;
-        try {
-            mKeyStore.load(null);
-            key = (SecretKey) mKeyStore.getKey(mClientId, null);
-        } catch (KeyStoreException e) {
-            errorMessage = getSecretKeyExceptionErrorPrefix
-                    + "KeyStoreException";
-        } catch (CertificateException e) {
-            errorMessage = getSecretKeyExceptionErrorPrefix
-                    + "CertificateException";
-        } catch (UnrecoverableKeyException e) {
-            errorMessage = getSecretKeyExceptionErrorPrefix
-                    + "UnrecoverableKeyException";
-        } catch (IOException e) {
-            errorMessage = getSecretKeyExceptionErrorPrefix
-                    + "IOException";
-        } catch (NoSuchAlgorithmException e) {
-            errorMessage = getSecretKeyExceptionErrorPrefix
-                    + "NoSuchAlgorithmException";
-        }
-        if (key == null) {
-            Log.e(TAG, errorMessage);
-        }
-        return key;
-    }
+//    private SecretKey getSecretKey() {
+//        String errorMessage = "";
+//        String getSecretKeyExceptionErrorPrefix = "Failed to get SecretKey from KeyStore: ";
+//        SecretKey key = null;
+//        try {
+//            mKeyStore.load(null);
+//            key = (SecretKey) mKeyStore.getKey(mClientId, null);
+//        } catch (KeyStoreException e) {
+//            errorMessage = getSecretKeyExceptionErrorPrefix
+//                    + "KeyStoreException";
+//        } catch (CertificateException e) {
+//            errorMessage = getSecretKeyExceptionErrorPrefix
+//                    + "CertificateException";
+//        } catch (UnrecoverableKeyException e) {
+//            errorMessage = getSecretKeyExceptionErrorPrefix
+//                    + "UnrecoverableKeyException";
+//        } catch (IOException e) {
+//            errorMessage = getSecretKeyExceptionErrorPrefix
+//                    + "IOException";
+//        } catch (NoSuchAlgorithmException e) {
+//            errorMessage = getSecretKeyExceptionErrorPrefix
+//                    + "NoSuchAlgorithmException";
+//        }
+//        if (key == null) {
+//            Log.e(TAG, errorMessage);
+//        }
+//        return key;
+//    }
 
     /**
      * Creates a symmetric key in the Android Key Store which can only be used after the user has
@@ -694,11 +694,10 @@ public class FingerprintAuth extends CordovaPlugin {
     
     // can be removed after ionic 4 migration is done
     private void showAuthenticationScreen() {
-        // Create the Confirm Credentials screen. You can customize the title and description. Or
-        // we will provide a generic one for you if you leave it null
         Intent intent = mKeyguardManager.createConfirmDeviceCredentialIntent(null, null);
         if (intent != null) {
-            startActivityForResult(intent, REQUEST_CODE_CONFIRM_DEVICE_CREDENTIALS);
+            cordova.setActivityResultCallback(this);
+            cordova.getActivity().startActivityForResult(intent, REQUEST_CODE_CONFIRM_DEVICE_CREDENTIALS);
         }
     }
     
@@ -718,7 +717,7 @@ public class FingerprintAuth extends CordovaPlugin {
         byte[] mCipherIV;
 
         try {
-            SecretKey key = getSecretKey();
+            SecretKey key = FingerprintAuth.getSecretKey();
 
             if (mCipherModeCrypt) {
                 mCipher.init(Cipher.ENCRYPT_MODE, key);
@@ -850,5 +849,34 @@ public class FingerprintAuth extends CordovaPlugin {
             Log.e(TAG, errorMessage);
         }
         return key;
+    }
+
+    /**
+     * Set a String preference
+     *
+     * @param context App context
+     * @param name    Preference name
+     * @param key     Preference key
+     * @param value   Preference value to be saved
+     */
+    public static void setStringPreference(Context context, String name, String key, String value) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(name, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putString(key, value);
+        editor.apply();
+    }
+
+    /**
+     * Get a String preference
+     *
+     * @param context App context
+     * @param name    Preference name
+     * @param key     Preference key
+     * @return Requested preference, if not exist returns null
+     */
+    public static String getStringPreference(Context context, String name, String key) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(name, Context.MODE_PRIVATE);
+        return sharedPreferences.getString(key, null);
     }
 }
