@@ -105,7 +105,7 @@ public class FingerprintAuth extends CordovaPlugin {
     public static boolean mDisableBackup = false;
     public static String mDialogMessage;
     public static boolean mEncryptNoAuth = false;
-    public static mDisableBackup = true;
+    public static boolean mDisableBackup = true;
     public static int mMaxAttempts = 3;
     public static boolean mUserAuthRequired = true;
     public static String mDialogTitle;
