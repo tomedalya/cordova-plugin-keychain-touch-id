@@ -20,6 +20,7 @@ import android.hardware.fingerprint.FingerprintManager;
 import android.os.Bundle;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyPermanentlyInvalidatedException;
+import java.io.UnsupportedEncodingException;
 import android.security.keystore.KeyProperties;
 import android.util.Base64;
 import android.util.DisplayMetrics;
@@ -91,7 +92,8 @@ public class FingerprintAuth extends CordovaPlugin {
             MISSING_PARAMETERS,
             NO_SUCH_ALGORITHM_EXCEPTION,
             SECURITY_EXCEPTION,
-            FRAGMENT_NOT_EXIST
+            FRAGMENT_NOT_EXIST,
+            UNSUPPORTED_ENCODING
         }
     private static String mClientSecret;
     private static boolean mCipherModeCrypt = true;
@@ -100,6 +102,7 @@ public class FingerprintAuth extends CordovaPlugin {
     public static final String FINGERPRINT_PREF_IV = "aes_iv";
     private static final int REQUEST_CODE_CONFIRM_DEVICE_CREDENTIALS = 1;
     private static final String CREDENTIAL_DELIMITER = "|:|";
+    public static boolean mDisableBackup = false;
 
     /**
      * Alias for our key in the Android Key Store
@@ -299,7 +302,7 @@ public class FingerprintAuth extends CordovaPlugin {
             // can be deleted after migration is done
             final JSONObject arg_object = args.getJSONObject(0);
             boolean mEncryptNoAuth = false;
-            boolean mDisableBackup = true;
+            mDisableBackup = true;
             int mMaxAttempts = 3;
             boolean mUserAuthRequired = true;
             String mDialogTitle;
@@ -810,6 +813,9 @@ public class FingerprintAuth extends CordovaPlugin {
         } catch (JSONException e) {
             Log.e(TAG, "Failed to set resultJson key value pair: " + e.toString());
             errorMessage = PluginError.JSON_EXCEPTION.name();
+        } catch (UnsupportedEncodingException e) {
+            Log.e(TAG, "Failed to set resultJson key value pair: " + e.toString());
+            errorMessage = PluginError.UNSUPPORTED_ENCODING.name();
         }
 
         if (createdResultJson) {
