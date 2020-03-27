@@ -206,7 +206,8 @@ public class FingerprintAuthenticationDialogFragment extends DialogFragment
 
     @Override
     public void onAuthenticated(FingerprintManager.AuthenticationResult result) {
-        //not needed
+        mFingerPrintAuth.onAuthenticated(true /* withFingerprint */);
+        dismissAllowingStateLoss();
     }
 
     @Override
