@@ -102,7 +102,6 @@ public class FingerprintAuth extends CordovaPlugin {
     public static final String FINGERPRINT_PREF_IV = "aes_iv";
     private static final int REQUEST_CODE_CONFIRM_DEVICE_CREDENTIALS = 1;
     private static final String CREDENTIAL_DELIMITER = "|:|";
-    public static boolean mDisableBackup = false;
     public static String mDialogMessage;
     public static boolean mEncryptNoAuth = false;
     public static boolean mDisableBackup = true;
@@ -413,7 +412,7 @@ public class FingerprintAuth extends CordovaPlugin {
                                                 // This happens if the lock screen has been disabled or or a fingerprint got
                                                 // enrolled. Thus show the dialog to authenticate with their password
                                                 mFragmentOld.setCryptoObject(new FingerprintManager.CryptoObject(mCipher));
-                                                mFragmentOld.setStage(FingerprintAuthenticationDialogFragment.Stage.NEW_FINGERPRINT_ENROLLED);
+                                                mFragmentOld.setStage(FingerprintAuthenticationDialogFragmentOld.Stage.NEW_FINGERPRINT_ENROLLED);
                                                 FragmentTransaction transaction = cordova.getActivity().getFragmentManager().beginTransaction();
                                                 transaction.add(mFragmentOld, DIALOG_FRAGMENT_TAG);
                                                 transaction.commitAllowingStateLoss();
@@ -884,5 +883,10 @@ public class FingerprintAuth extends CordovaPlugin {
     public static String getStringPreference(Context context, String name, String key) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(name, Context.MODE_PRIVATE);
         return sharedPreferences.getString(key, null);
+    }
+
+    public static void onError(CharSequence errString) {
+        mCallbackContext.error(PluginError.FINGERPRINT_ERROR.name());
+        Log.e(TAG, errString.toString());
     }
 }
