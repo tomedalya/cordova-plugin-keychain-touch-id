@@ -399,23 +399,23 @@ public class FingerprintAuth extends CordovaPlugin {
                                     public void run() {
                                         // Set up the crypto object for later. The object will be authenticated by use
                                         // of the fingerprint.
-                                        mFragment = new FingerprintAuthenticationDialogFragment();
+                                        FingerprintAuthenticationDialogFragmentOld mFragmentOld = new FingerprintAuthenticationDialogFragmentOld();
                                         if (initCipher()) {
-                                            mFragment.setCancelable(false);
+                                            mFragmentOld.setCancelable(false);
                                             // Show the fingerprint dialog. The user has the option to use the fingerprint with
                                             // crypto, or you can fall back to using a server-side verified password.
-                                            mFragment.setCryptoObject(new FingerprintManager.CryptoObject(mCipher));
+                                            mFragmentOld.setCryptoObject(new FingerprintManager.CryptoObject(mCipher));
                                             FragmentTransaction transaction = cordova.getActivity().getFragmentManager().beginTransaction();
-                                            transaction.add(mFragment, DIALOG_FRAGMENT_TAG);
+                                            transaction.add(mFragmentOld, DIALOG_FRAGMENT_TAG);
                                             transaction.commitAllowingStateLoss();
                                         } else {
                                             if (!mDisableBackup) {
                                                 // This happens if the lock screen has been disabled or or a fingerprint got
                                                 // enrolled. Thus show the dialog to authenticate with their password
-                                                mFragment.setCryptoObject(new FingerprintManager.CryptoObject(mCipher));
-                                                mFragment.setStage(FingerprintAuthenticationDialogFragment.Stage.NEW_FINGERPRINT_ENROLLED);
+                                                mFragmentOld.setCryptoObject(new FingerprintManager.CryptoObject(mCipher));
+                                                mFragmentOld.setStage(FingerprintAuthenticationDialogFragment.Stage.NEW_FINGERPRINT_ENROLLED);
                                                 FragmentTransaction transaction = cordova.getActivity().getFragmentManager().beginTransaction();
-                                                transaction.add(mFragment, DIALOG_FRAGMENT_TAG);
+                                                transaction.add(mFragmentOld, DIALOG_FRAGMENT_TAG);
                                                 transaction.commitAllowingStateLoss();
                                             } else {
                                                 Log.e(TAG, "Failed to init Cipher and backup disabled.");
