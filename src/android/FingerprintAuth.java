@@ -103,6 +103,13 @@ public class FingerprintAuth extends CordovaPlugin {
     private static final int REQUEST_CODE_CONFIRM_DEVICE_CREDENTIALS = 1;
     private static final String CREDENTIAL_DELIMITER = "|:|";
     public static boolean mDisableBackup = false;
+    public static String mDialogMessage;
+    public static boolean mEncryptNoAuth = false;
+    public static mDisableBackup = true;
+    public static int mMaxAttempts = 3;
+    public static boolean mUserAuthRequired = true;
+    public static String mDialogTitle;
+    public static String mDialogHint;
 
     /**
      * Alias for our key in the Android Key Store
@@ -301,13 +308,6 @@ public class FingerprintAuth extends CordovaPlugin {
         } else if (action.equals("get")) { //get key
             // can be deleted after migration is done
             final JSONObject arg_object = args.getJSONObject(0);
-            boolean mEncryptNoAuth = false;
-            mDisableBackup = true;
-            int mMaxAttempts = 3;
-            boolean mUserAuthRequired = true;
-            String mDialogTitle;
-            String mDialogMessage;
-            String mDialogHint;
             JSONObject resultJson = new JSONObject();
 
                 if (!arg_object.has("clientId")) {
